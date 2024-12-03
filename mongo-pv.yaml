@@ -10,3 +10,6 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /data/mongo
+  claimRef:
+    namespace: default
+    name: mongo-pvc

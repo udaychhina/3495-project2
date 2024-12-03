@@ -9,6 +9,9 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: db/init.sql # Local path on the host
+  claimRef:
+    namespace: default
+    name: mysql-init-pvc
 
 ---
 apiVersion: v1
