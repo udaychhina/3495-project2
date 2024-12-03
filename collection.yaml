@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: collection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: collection
+  template:
+    metadata:
+      labels:
+        app: collection
+    spec:
+      containers:
+      - name: collection
+        image: udaychhina/collection:latest
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: collection
+spec:
+  selector:
+    app: collection
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
