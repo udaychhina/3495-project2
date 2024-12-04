@@ -24,6 +24,13 @@ spec:
         image: udaychhina/analysis:latest
         ports:
         - containerPort: 6000
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -32,7 +39,27 @@ metadata:
 spec:
   selector:
     app: analysis
+  type: LoadBalancer
   ports:
   - protocol: TCP
     port: 6000
     targetPort: 6000
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: analysis-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: analysis
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50

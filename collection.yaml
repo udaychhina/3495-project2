@@ -13,9 +13,6 @@ spec:
         app: collection
     spec:
       initContainers:
-      # - name: wait-for-authentication
-      #   image: busybox
-      #   command: ["sh", "-c", "until nc -z authentication 5000; do echo waiting for authentication; sleep 5; done"]
       - name: wait-for-mysql
         image: busybox
         command: ["sh", "-c", "until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done"]
@@ -24,6 +21,13 @@ spec:
         image: udaychhina/collection:latest
         ports:
         - containerPort: 3000
+        resources:
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -32,7 +36,27 @@ metadata:
 spec:
   selector:
     app: collection
+  type: LoadBalancer
   ports:
   - protocol: TCP
     port: 3000
     targetPort: 3000
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: collection-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: collection
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
