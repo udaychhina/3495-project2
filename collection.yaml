@@ -12,6 +12,13 @@ spec:
       labels:
         app: collection
     spec:
+      initContainers:
+      # - name: wait-for-authentication
+      #   image: busybox
+      #   command: ["sh", "-c", "until nc -z authentication 5000; do echo waiting for authentication; sleep 5; done"]
+      - name: wait-for-mysql
+        image: busybox
+        command: ["sh", "-c", "until nc -z mysql 3306; do echo waiting for mysql; sleep 2; done"]
       containers:
       - name: collection
         image: udaychhina/collection:latest
